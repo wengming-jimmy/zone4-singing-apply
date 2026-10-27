@@ -263,9 +263,11 @@ $("f").addEventListener("submit",async e=>{
     const j=await r.json();
     if(!j.ok) throw new Error(j.error||"fail");
     $("confirmText").textContent=j.text||"";
-    $("emailNote").innerHTML=j.emailOk
-      ? "✅ 已寫入報名表，確認信已寄到 <b>"+data.email+"</b>，信裡附上同一份內容，請再確認一次。沒看到信請先看垃圾信件夾。"
-      : "⚠️ 已寫入報名表，但確認信寄送失敗（"+(j.emailErr||"原因不明")+"）。請先複製下面這份確認文字留存，並直接聯絡主辦單位確認。";
+    $("emailNote").innerHTML=(j.emailOk&&j.chairmanEmailOk)
+      ? "✅ 已寫入報名表，確認信已寄到 <b>"+data.email+"</b>，副本也已寄給專區主席程翔聖，信裡附上同一份內容，請再確認一次。沒看到信請先看垃圾信件夾。"
+      : (j.emailOk
+      ? "⚠️ 已寫入報名表，確認信已寄到 <b>"+data.email+"</b>，但寄給專區主席的副本失敗（"+(j.chairmanEmailErr||"原因不明")+"）。請先複製下面這份確認文字留存，並直接聯絡主辦單位確認。"
+      : "⚠️ 已寫入報名表，但確認信寄送失敗（"+(j.emailErr||"原因不明")+"）。請先複製下面這份確認文字留存，並直接聯絡主辦單位確認。");
     $("resultSec").style.display="block";
     $("resultSec").scrollIntoView({behavior:"smooth"});
     $("msg").innerHTML="<span class='ok'>✅ 已送出報名。</span>";
