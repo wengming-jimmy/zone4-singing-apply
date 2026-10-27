@@ -49,7 +49,7 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 <h2>第一步：先選報名組別</h2>
 <p class="lead">四組只能選一組，選好之後下面才會出現要填的資料。每一參賽節目填寫一張表。</p>
 <div class="grid">
-<button type="button" class="groupbtn" data-g="合唱組"><b>🎤 合唱組</b><small>可跨不同分會組隊，團員請逐一填所屬分會</small></button>
+<button type="button" class="groupbtn" data-g="對唱組"><b>🎤 對唱組</b><small>兩人對唱，可跨不同分會組隊</small></button>
 <button type="button" class="groupbtn" data-g="獨唱組"><b>🎙️ 獨唱組</b><small>一人一首，填一位參賽者</small></button>
 <button type="button" class="groupbtn" data-g="長青組"><b>🌟 長青組</b><small>填一位參賽者</small></button>
 <button type="button" class="groupbtn" data-g="新人組"><b>✨ 新人組</b><small>入會未滿一年，入會日期必填</small></button>
@@ -63,7 +63,7 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 <form id="f">
 <label for="club" id="clubLabel">報名分會 ＊</label>
 <input id="club" type="text" required placeholder="例如：台北市○○獅子會">
-<p class="small" id="clubNote" style="display:none">合唱組是跨分會組隊，這一欄可以不填，以下面團員名單裡每位團員的所屬分會為準。</p>
+<p class="small" id="clubNote" style="display:none">對唱組是跨分會組隊，這一欄可以不填，以下面團員名單裡每位團員的所屬分會為準。</p>
 
 <label for="zone">分區 ＊</label>
 <select id="zone" required>
@@ -120,13 +120,13 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 </select>
 
 <label for="keyNote">升降Key／備註</label>
-<textarea id="keyNote" rows="3" placeholder="例如：降 2 Key；或：合唱超過 8 人，多的團員名單寫在這裡"></textarea>
+<textarea id="keyNote" rows="3" placeholder="例如：降 2 Key"></textarea>
 
 <div id="chorusWrap" style="display:none">
-<h2 style="margin-top:16px">合唱組團員名單</h2>
-<p class="lead">可跨不同分會組隊，每位團員都要填姓名和所屬分會，手機是選填，手機版姓名、分會、電話都會顯示。照片在下面「團員照片」區，每位團員各傳一張。</p>
+<h2 style="margin-top:16px">對唱組兩位團員</h2>
+<p class="lead">對唱組就是兩個人，兩位都要填姓名和所屬分會，可跨不同分會組隊，手機是選填。照片在下面「團員照片」區，兩位各傳一張。</p>
 <div id="chorusRows"></div>
-<p class="small">合唱總人數：<b id="chorusTotal">0</b> 人（依上面填了姓名的團員自動計算）。如超過 8 人，請把多的團員名單寫在上面的「升降Key／備註」。</p>
+<p class="small">對唱總人數：<b id="chorusTotal">0</b> 人（對唱組固定 2 人，兩位都要填）。</p>
 </div>
 
 <div class="row3">
@@ -136,7 +136,7 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 </div>
 
 <p class="small"><b>填表提醒</b><br>
-1. 每一參賽節目填寫一張表；合唱組可由不同分會共同組隊，請逐一列出團員所屬分會。<br>
+1. 每一參賽節目填寫一張表；對唱組可由不同分會共同組隊，請逐一列出團員所屬分會。<br>
 2. 請確認歌曲語言、名稱、原唱歌手及實際伴唱版本；各組資格與賽制以正式公告為準。</p>
 
 <label style="display:flex;gap:10px;align-items:flex-start;line-height:1.6"><input type="checkbox" id="agree" required style="width:20px;height:20px;margin-top:3px"> 我已確認歌曲語言、名稱、原唱歌手及實際伴唱版本無誤。</label>
@@ -165,7 +165,7 @@ const TOKEN=(typeof SINGING_API!=="undefined"&&SINGING_API.token)?SINGING_API.to
 let group="";
 const chorusEl=$("chorusRows");
 const chorusPhotoEl=$("chorusPhotoRows");
-for(let i=1;i<=8;i++){
+for(let i=1;i<=2;i++){
   const d=document.createElement("div"); d.className="chorus-row";
   d.innerHTML="<span>"+i+"</span><input data-k='mname' placeholder='團員姓名 ＊'><input class='c2' data-k='mclub' placeholder='所屬獅子會／分會名稱 ＊'><input class='c3' data-k='mphone' type='tel' placeholder='聯絡電話（選填）'>";
   chorusEl.appendChild(d);
@@ -190,15 +190,15 @@ document.querySelectorAll(".groupbtn").forEach(b=>{
     document.querySelectorAll(".groupbtn").forEach(x=>x.classList.toggle("active",x===b));
     $("groupNote").textContent="你選的是："+group+"，請往下填資料。";
     $("formTitle").textContent="報名資料（"+group+"）";
-    $("formLead").textContent=group==="合唱組"?"合唱組請填團員名單，可跨不同分會組隊。":group==="新人組"?"新人組是入會未滿一年，入會日期必填，請填民國年。":"請照紙本欄位填寫，歌曲資訊請再三確認。";
+    $("formLead").textContent=group==="對唱組"?"對唱組就是兩個人對唱，兩位都要填姓名和所屬分會。":group==="新人組"?"新人組是入會未滿一年，入會日期必填，請填民國年。":"請照紙本欄位填寫，歌曲資訊請再三確認。";
     $("joinWrap").style.display=group==="新人組"?"block":"none";
-    $("chorusWrap").style.display=group==="合唱組"?"block":"none";
-    $("chorusPhotoWrap").style.display=group==="合唱組"?"block":"none";
-    $("singlePhotoWrap").style.display=group==="合唱組"?"none":"block";
-    $("club").required=group!=="合唱組";
-    $("clubLabel").textContent=group==="合唱組"?"報名分會（合唱組可不填）":"報名分會 ＊";
-    $("clubNote").style.display=group==="合唱組"?"block":"none";
-    $("photo").required=group!=="合唱組";
+    $("chorusWrap").style.display=group==="對唱組"?"block":"none";
+    $("chorusPhotoWrap").style.display=group==="對唱組"?"block":"none";
+    $("singlePhotoWrap").style.display=group==="對唱組"?"none":"block";
+    $("club").required=group!=="對唱組";
+    $("clubLabel").textContent=group==="對唱組"?"報名分會（對唱組可不填）":"報名分會 ＊";
+    $("clubNote").style.display=group==="對唱組"?"block":"none";
+    $("photo").required=group!=="對唱組";
     $("formSec").style.display="block";
     $("formSec").scrollIntoView({behavior:"smooth"});
   };
@@ -251,17 +251,17 @@ $("f").addEventListener("submit",async e=>{
   let lang=$("lang").value;
   if(lang==="其他") lang="其他："+$("langOther").value.trim();
   let members="", total=0, memberNames=[];
-  if(group==="合唱組"){
+  if(group==="對唱組"){
     const rows=[...chorusEl.children].map((r,idx)=>{
       const n=r.querySelector("[data-k='mname']").value.trim();
       const c=r.querySelector("[data-k='mclub']").value.trim();
       const p=r.querySelector("[data-k='mphone']").value.trim();
-      if(n && !c){ alert("合唱組第 "+(idx+1)+" 位團員請填所屬分會。"); throw new Error("missing club"); }
+      if(n && !c){ alert("對唱組第 "+(idx+1)+" 位團員請填所屬分會。"); throw new Error("missing club"); }
       if(n) memberNames.push(n);
       return n? n+"（"+c+"）"+(p?"，電話："+p:"") : "";
     }).filter(Boolean);
     members=rows.join("\n"); total=rows.length;
-    if(!total){ alert("合唱組請至少填一位團員。"); return; }
+    if(total!==2){ alert("對唱組請填兩位團員，兩位都要填姓名和所屬分會。"); return; }
   }
   const data={
     group:group, club:$("club").value.trim(), zone:$("zone").value,
@@ -269,11 +269,11 @@ $("f").addEventListener("submit",async e=>{
     joinDate:joinDate, song:$("song").value.trim(), lang:lang,
     singer:$("singer").value.trim(), version:$("version").value.trim(),
     sound:$("sound").value, keyNote:$("keyNote").value.trim(),
-    members:members, total:group==="合唱組"?String(total):"",
+    members:members, total:group==="對唱組"?String(total):"",
     filler:$("filler").value.trim(), fillerPhone:$("fillerPhone").value.trim(), fillDate:$("fillDate").value
   };
   const missing=[];
-  (group==="合唱組"?["zone","name","phone","email","song","lang","singer","sound"]:["club","zone","name","phone","email","song","lang","singer","sound"]).forEach(k=>{ if(!data[k]) missing.push(k); });
+  (group==="對唱組"?["zone","name","phone","email","song","lang","singer","sound"]:["club","zone","name","phone","email","song","lang","singer","sound"]).forEach(k=>{ if(!data[k]) missing.push(k); });
   if(missing.length){ alert("還有必填欄位沒填，請檢查後再送出。"); return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ alert("Email 格式不對，請檢查後再送出。"); return; }
   if(!$("agree").checked){ alert("請勾選已確認歌曲資訊。"); return; }
@@ -281,11 +281,11 @@ $("f").addEventListener("submit",async e=>{
   $("submitBtn").disabled=true; $("submitBtn").textContent="照片處理中…"; $("msg").textContent="正在縮圖上傳照片，請稍等…";
   let photos=[];
   try{
-    if(group==="合唱組"){
+    if(group==="對唱組"){
       const photoInputs=[...chorusPhotoEl.querySelectorAll("[data-k='mphoto']")];
       for(let i=0;i<memberNames.length;i++){
         const f=photoInputs[i] && photoInputs[i].files[0];
-        if(!f){ alert("合唱組第 "+(i+1)+" 位團員（"+memberNames[i]+"）請上傳一張照片，初賽 PPT 介紹要用。"); $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
+        if(!f){ alert("對唱組第 "+(i+1)+" 位團員（"+memberNames[i]+"）請上傳一張照片，初賽 PPT 介紹要用。"); $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
         const cp=await compressPhoto(f);
         photos.push({ memberName:memberNames[i], name:cp.name, mime:cp.mime, data:cp.data });
       }
