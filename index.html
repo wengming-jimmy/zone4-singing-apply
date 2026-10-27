@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第四專區歌唱比賽初賽｜報名表</title>
+<meta name="robots" content="noindex">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;background:#fdf6ec;color:#2b2118}
+header{background:#7c2d12;color:#fff;padding:22px 18px;text-align:center}
+header h1{margin:0;font-size:26px;line-height:1.4} header p{margin:8px 0 0;line-height:1.7;color:#ffedd5}
+main{max-width:720px;margin:0 auto;padding:16px 14px 48px}
+section{background:#fff;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+h2{font-size:19px;margin:0 0 6px} p.lead{color:#5b4a3d;line-height:1.7;margin:0 0 12px}
+label{display:block;font-weight:800;margin:14px 0 6px}
+input[type=text],input[type=tel],input[type=email],input[type=number],input[type=date],textarea,select{width:100%;padding:13px;border:2px solid #e7d5c3;border-radius:12px;font-size:17px;background:#fff}
+textarea{line-height:1.65}
+button{width:100%;padding:14px;border:0;border-radius:14px;font-size:17px;font-weight:900;cursor:pointer}
+.primary{background:#7c2d12;color:#fff;margin-top:16px}
+.ghost{background:#fef3c7;color:#7c2d12;margin-top:10px}
+.small{font-size:14px;color:#6b5a4d;line-height:1.7}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.groupbtn{background:#fff7ed;border:2px solid #e7d5c3;color:#7c2d12;padding:16px 10px;line-height:1.5}
+.groupbtn b{display:block;font-size:19px}
+.groupbtn small{color:#6b5a4d;font-weight:700}
+.groupbtn.active{background:#7c2d12;color:#fff;border-color:#7c2d12}
+.groupbtn.active small{color:#ffedd5}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.chorus-row{display:grid;grid-template-columns:32px 1fr 1fr 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.chorus-row input{padding:10px;font-size:15px}
+.chorus-row span{font-weight:800;text-align:center}
+pre.confirm{white-space:pre-wrap;word-break:break-word;background:#fdf6ec;border:2px solid #e7d5c3;border-radius:12px;padding:14px;line-height:1.7;font-size:15px;font-family:inherit}
+.ok{color:#166534;font-weight:800}
+@media(max-width:560px){.grid,.row,.row3{grid-template-columns:1fr}.chorus-row{grid-template-columns:24px 1fr}.chorus-row .c2,.chorus-row .c3{display:none}}
+</style>
+</head>
+<body>
+<header><h1>國際獅子會300A-2區｜2026-2027年度<br>第四專區歌唱比賽報名表</h1><p>獅賢服務・共創幸福<br>第四專區歌唱比賽初賽</p></header>
+<main>
+<section id="step1">
+<h2>第一步：先選報名組別</h2>
+<p class="lead">四組只能選一組，選好之後下面才會出現要填的資料。每一參賽節目填寫一張表。</p>
+<div class="grid">
+<button type="button" class="groupbtn" data-g="合唱組"><b>🎤 合唱組</b><small>可跨不同分會組隊，團員請逐一填所屬分會</small></button>
+<button type="button" class="groupbtn" data-g="獨唱組"><b>🎙️ 獨唱組</b><small>一人一首，填一位參賽者</small></button>
+<button type="button" class="groupbtn" data-g="長青組"><b>🌟 長青組</b><small>填一位參賽者</small></button>
+<button type="button" class="groupbtn" data-g="新人組"><b>✨ 新人組</b><small>入會未滿一年，入會日期必填</small></button>
+</div>
+<p class="small" id="groupNote">還沒選組別。下面表單選好組別後才會出現。</p>
+</section>
+
+<section id="formSec" style="display:none">
+<h2 id="formTitle">報名資料</h2>
+<p class="lead" id="formLead"></p>
+<form id="f">
+<label for="club">報名分會 ＊</label>
+<input id="club" type="text" required placeholder="例如：台北市○○獅子會">
+
+<label for="zone">分區 ＊</label>
+<select id="zone" required>
+<option value="">請選分區</option><option>第7分區</option><option>第8分區</option>
+</select>
+
+<label for="name">參賽者／聯絡人姓名 ＊</label>
+<input id="name" type="text" required placeholder="例如：王小明">
+
+<div class="row">
+<div><label for="phone">手機 ＊</label><input id="phone" type="tel" required placeholder="例如：0912-345-678"></div>
+<div><label for="email">Email ＊（確認信會寄到這裡）</label><input id="email" type="email" required placeholder="例如：abc@example.com"></div>
+</div>
+<p class="small">紙本沒有 Email 欄，這一欄是為了報名成功後寄確認信才加的，不會印在紙本上。</p>
+
+<div id="joinWrap" style="display:none">
+<label>入會日期 ＊（新人組必填，民國年）</label>
+<div class="row3">
+<input id="joinY" type="number" min="1" max="200" placeholder="民國 年，例如 115">
+<input id="joinM" type="number" min="1" max="12" placeholder="月">
+<input id="joinD" type="number" min="1" max="31" placeholder="日">
+</div>
+</div>
+
+<label for="song">參賽歌曲名稱 ＊</label>
+<input id="song" type="text" required placeholder="例如：月亮代表我的心">
+
+<label for="lang">歌曲語言類別 ＊</label>
+<select id="lang" required>
+<option value="">請選語言</option><option>國語</option><option>台語</option><option>英文</option><option>其他</option>
+</select>
+<div id="langOtherWrap" style="display:none"><label for="langOther">其他語言請寫明</label><input id="langOther" type="text" placeholder="例如：客語、日文"></div>
+
+<div class="row">
+<div><label for="singer">原唱歌手 ＊</label><input id="singer" type="text" required placeholder="例如：鄧麗君"></div>
+<div><label for="version">版本／演唱者</label><input id="version" type="text" placeholder="實際要唱的版本或演唱者"></div>
+</div>
+
+<label for="sound">演唱與音源 ＊</label>
+<select id="sound" required>
+<option value="">請選</option><option>自備伴唱檔</option><option>需協助伴唱版本</option><option>自備樂器</option><option>無伴唱</option>
+</select>
+
+<label for="keyNote">升降Key／備註</label>
+<textarea id="keyNote" rows="3" placeholder="例如：降 2 Key；或：合唱超過 8 人，多的團員名單寫在這裡"></textarea>
+
+<div id="chorusWrap" style="display:none">
+<h2 style="margin-top:16px">合唱組團員名單</h2>
+<p class="lead">可跨不同分會組隊，每位團員請分別填寫所屬分會。手機是選填。手機版只顯示姓名欄，分會與電話請用電腦填，或填完姓名後在「升降Key／備註」補上分會。</p>
+<div id="chorusRows"></div>
+<p class="small">合唱總人數：<b id="chorusTotal">0</b> 人（依上面填了姓名的團員自動計算）。如超過 8 人，請把多的團員名單寫在上面的「升降Key／備註」。</p>
+</div>
+
+<div class="row3">
+<div><label for="filler">分會填表人</label><input id="filler" type="text" placeholder="填表人姓名"></div>
+<div><label for="fillerPhone">分會填表人電話</label><input id="fillerPhone" type="tel" placeholder="電話"></div>
+<div><label for="fillDate">填表日期</label><input id="fillDate" type="date"></div>
+</div>
+
+<p class="small"><b>填表提醒</b><br>
+1. 每一參賽節目填寫一張表；合唱組可由不同分會共同組隊，請逐一列出團員所屬分會。<br>
+2. 請確認歌曲語言、名稱、原唱歌手及實際伴唱版本；各組資格與賽制以正式公告為準。</p>
+
+<label style="display:flex;gap:10px;align-items:flex-start;line-height:1.6"><input type="checkbox" id="agree" required style="width:20px;height:20px;margin-top:3px"> 我已確認歌曲語言、名稱、原唱歌手及實際伴唱版本無誤。</label>
+
+<button class="primary" type="submit" id="submitBtn">✅ 送出報名表</button>
+<button class="ghost" type="button" id="changeGroupBtn">↩️ 換一個組別</button>
+<p id="msg" class="small"></p>
+<p class="small">提醒：這支程式只收上面這些報名資料，不收密碼、身分證、銀行帳號或驗證碼。送出後請等確認信，沒收到信先檢查垃圾信件夾，還是沒有就直接聯絡主辦單位。</p>
+</form>
+</section>
+
+<section id="resultSec" style="display:none">
+<h2>✅ 已收到報名，請確認以下內容</h2>
+<p class="lead" id="emailNote"></p>
+<pre class="confirm" id="confirmText"></pre>
+<button class="ghost" id="copyBtn">📋 複製這份確認文字</button>
+<p class="small" id="copyMsg"></p>
+<p class="small">如果上面有錯，請直接回覆確認信更正，或重新填一次並在備註寫「更正前一筆」。收到確認信代表「已收到報名」，不是「已通過資格審查」，各組資格與賽制以正式公告為準。</p>
+</section>
+</main>
+<script src="config.js?v=20261027"></script>
+<script>
+const $=id=>document.getElementById(id);
+const API=(typeof SINGING_API!=="undefined"&&SINGING_API.url)?SINGING_API.url:"";
+const TOKEN=(typeof SINGING_API!=="undefined"&&SINGING_API.token)?SINGING_API.token:"";
+let group="";
+const chorusEl=$("chorusRows");
+for(let i=1;i<=8;i++){
+  const d=document.createElement("div"); d.className="chorus-row";
+  d.innerHTML="<span>"+i+"</span><input data-k='mname' placeholder='團員姓名'><input class='c2' data-k='mclub' placeholder='所屬獅子會／分會名稱'><input class='c3' data-k='mphone' type='tel' placeholder='聯絡電話（選填）'>";
+  chorusEl.appendChild(d);
+}
+function updateTotal(){
+  const names=[...chorusEl.querySelectorAll("[data-k='mname']")].filter(x=>x.value.trim()).length;
+  $("chorusTotal").textContent=names;
+}
+chorusEl.addEventListener("input",updateTotal);
+document.querySelectorAll(".groupbtn").forEach(b=>{
+  b.onclick=()=>{
+    group=b.dataset.g;
+    document.querySelectorAll(".groupbtn").forEach(x=>x.classList.toggle("active",x===b));
+    $("groupNote").textContent="你選的是："+group+"，請往下填資料。";
+    $("formTitle").textContent="報名資料（"+group+"）";
+    $("formLead").textContent=group==="合唱組"?"合唱組請填團員名單，可跨不同分會組隊。":group==="新人組"?"新人組是入會未滿一年，入會日期必填，請填民國年。":"請照紙本欄位填寫，歌曲資訊請再三確認。";
+    $("joinWrap").style.display=group==="新人組"?"block":"none";
+    $("chorusWrap").style.display=group==="合唱組"?"block":"none";
+    $("formSec").style.display="block";
+    $("formSec").scrollIntoView({behavior:"smooth"});
+  };
+});
+$("changeGroupBtn").onclick=()=>{ $("formSec").style.display="none"; $("step1").scrollIntoView({behavior:"smooth"}); };
+$("lang").addEventListener("change",()=>{ $("langOtherWrap").style.display=$("lang").value==="其他"?"block":"none"; });
+$("fillDate").value=new Date().toISOString().slice(0,10);
+$("copyBtn").onclick=async()=>{
+  const t=$("confirmText").textContent;
+  try{ await navigator.clipboard.writeText(t); $("copyMsg").textContent="✅ 已複製確認文字。"; }
+  catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); $("copyMsg").textContent="✅ 已複製確認文字。"; }
+};
+$("f").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!group){ alert("請先選報名組別。"); return; }
+  let phone=$("phone").value.trim().replace(/\s/g,"");
+  if(/^09\d{8}$/.test(phone)) phone=phone.slice(0,4)+"-"+phone.slice(4,7)+"-"+phone.slice(7);
+  let joinDate="";
+  if(group==="新人組"){
+    const y=$("joinY").value.trim(), m=$("joinM").value.trim(), d=$("joinD").value.trim();
+    if(!y||!m||!d){ alert("新人組請填入會日期（民國年、月、日都要填）。"); return; }
+    joinDate="民國"+y+"年"+m+"月"+d+"日";
+  }
+  let lang=$("lang").value;
+  if(lang==="其他") lang="其他："+$("langOther").value.trim();
+  let members="", total=0;
+  if(group==="合唱組"){
+    const rows=[...chorusEl.children].map(r=>{
+      const n=r.querySelector("[data-k='mname']").value.trim();
+      const c=r.querySelector("[data-k='mclub']").value.trim();
+      const p=r.querySelector("[data-k='mphone']").value.trim();
+      return n? n+(c?"（"+c+"）":"")+(p?"，電話："+p:"") : "";
+    }).filter(Boolean);
+    members=rows.join("\n"); total=rows.length;
+    if(!total){ alert("合唱組請至少填一位團員。"); return; }
+  }
+  const data={
+    group:group, club:$("club").value.trim(), zone:$("zone").value,
+    name:$("name").value.trim(), phone:phone, email:$("email").value.trim(),
+    joinDate:joinDate, song:$("song").value.trim(), lang:lang,
+    singer:$("singer").value.trim(), version:$("version").value.trim(),
+    sound:$("sound").value, keyNote:$("keyNote").value.trim(),
+    members:members, total:group==="合唱組"?String(total):"",
+    filler:$("filler").value.trim(), fillerPhone:$("fillerPhone").value.trim(), fillDate:$("fillDate").value
+  };
+  const missing=[];
+  ["club","zone","name","phone","email","song","lang","singer","sound"].forEach(k=>{ if(!data[k]) missing.push(k); });
+  if(missing.length){ alert("還有必填欄位沒填，請檢查後再送出。"); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ alert("Email 格式不對，請檢查後再送出。"); return; }
+  if(!$("agree").checked){ alert("請勾選已確認歌曲資訊。"); return; }
+  if(!API){ $("msg").innerHTML="⚠️ 資料庫還沒接好，這筆還沒寫入。請等部署完成後再送一次。"; return; }
+  $("submitBtn").disabled=true; $("submitBtn").textContent="送出中…"; $("msg").textContent="";
+  try{
+    const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(Object.assign({token:TOKEN},data))});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||"fail");
+    $("confirmText").textContent=j.text||"";
+    $("emailNote").innerHTML=j.emailOk
+      ? "✅ 已寫入報名表，確認信已寄到 <b>"+data.email+"</b>，信裡附上同一份內容，請再確認一次。沒看到信請先看垃圾信件夾。"
+      : "⚠️ 已寫入報名表，但確認信寄送失敗（"+(j.emailErr||"原因不明")+"）。請先複製下面這份確認文字留存，並直接聯絡主辦單位確認。";
+    $("resultSec").style.display="block";
+    $("resultSec").scrollIntoView({behavior:"smooth"});
+    $("msg").innerHTML="<span class='ok'>✅ 已送出報名。</span>";
+    $("f").reset(); $("fillDate").value=new Date().toISOString().slice(0,10);
+    $("joinWrap").style.display="none"; $("chorusWrap").style.display="none"; $("langOtherWrap").style.display="none";
+  }catch(err){
+    $("msg").textContent="⚠️ 送出失敗（可能是網路或資料庫還沒部署好），請確認網路後再按一次送出，不要重複填新的一筆。";
+  }
+  $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表";
+});
+</script>
+</body>
+</html>

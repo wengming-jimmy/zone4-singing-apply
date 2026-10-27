@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>後台｜第四專區歌唱比賽報名表</title>
+<meta name="robots" content="noindex">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;background:#fdf6ec;color:#2b2118}
+header{background:#7c2d12;color:#fff;padding:22px 18px;text-align:center}
+header h1{margin:0;font-size:25px} header p{margin:8px 0 0;color:#ffedd5;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:16px 14px 48px}
+section{background:#fff;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+h2{font-size:20px;margin:0 0 6px} p.lead{color:#5b4a3d;line-height:1.65;margin:0 0 12px}
+label{display:block;font-weight:800;margin:14px 0 6px}
+input[type=text],input[type=password],select{width:100%;padding:13px;border:2px solid #e7d5c3;border-radius:12px;font-size:17px}
+button{width:100%;padding:13px;border:0;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer}
+.primary{background:#7c2d12;color:#fff;margin-top:12px} .ghost{background:#fef3c7;color:#7c2d12;margin-top:10px} .danger{background:#fff0f0;color:#b00000;margin-top:10px}
+.small{font-size:14px;color:#6b5a4d;line-height:1.65}
+.item{border-top:1px solid #e7d5c3;padding:14px 0;line-height:1.65}
+.badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:14px;font-weight:800}
+.wait{background:#fef3c7;color:#92400e} .ok{background:#dcfce7;color:#166534}
+.actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}.actions button{margin:0;padding:9px;font-size:14px;width:auto;flex:1}
+pre.confirm{white-space:pre-wrap;word-break:break-word;background:#fdf6ec;border:1px solid #e7d5c3;border-radius:12px;padding:12px;line-height:1.65;font-size:14px;font-family:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>🔒 後台｜第四專區歌唱比賽報名表</h1><p>這個後台連結請不要公開貼出。<br>公開報名頁面沒有名單，只有這裡看得到明細。</p></header>
+<main>
+<section id="lockSec"><h2>🔑 後台密碼</h2><div id="lockBody"></div>
+<p class="small">提醒：這是存在你這支手機／電腦上的簡易鎖，用來擋住隨手點開的人，不是銀行等級的帳號密碼。真正保密要靠：不要把這個連結公開貼出，不要把解鎖後的手機借給別人。</p></section>
+<div id="adminBody" style="display:none">
+<section>
+<h2>📋 歌唱比賽報名名單</h2>
+<p class="lead">版本 2026-10-27。預設顯示全部報名，選組別／分區或打關鍵字可以篩選；匯出會只匯出目前看到的這批。</p>
+<div class="row">
+<div><label for="qGroup">按組別篩選</label>
+<select id="qGroup"><option value="">全部組別</option><option>合唱組</option><option>獨唱組</option><option>長青組</option><option>新人組</option></select></div>
+<div><label for="qZone">按分區篩選</label>
+<select id="qZone"><option value="">全部分區</option><option>第7分區</option><option>第8分區</option></select></div>
+</div>
+<input id="qName" type="text" placeholder="🔍 分會、參賽者、歌曲、原唱歌手關鍵字（可不填）">
+<p class="small" id="dbNote">正在準備載入…</p>
+<p class="small" id="count"></p>
+<button class="ghost" id="btnReload">🔄 從資料庫重新載入</button>
+<button class="ghost" id="btnExport">⬇️ 匯出目前查詢結果 CSV</button>
+<button class="ghost" id="lockBtn">🔒 鎖定後台</button>
+<button class="ghost" id="changePinBtn">🔑 換一個後台密碼</button>
+</section>
+<section><h2>📋 明細</h2><div id="list"></div></section>
+</div>
+</main>
+<script src="config.js?v=20261027"></script>
+<script>
+const $=id=>document.getElementById(id);
+const API=(typeof SINGING_API!=="undefined"&&SINGING_API.url)?SINGING_API.url:"";
+const TOKEN=(typeof SINGING_API!=="undefined"&&SINGING_API.token)?SINGING_API.token:"";
+const PINKEY="zone4-singing-admin-pin-v1";
+let allRows=[],viewRows=[];
+function esc(s){return String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function render(){
+  const q=($("qName").value||"").trim();
+  const g=$("qGroup").value, z=$("qZone").value;
+  let list=allRows;
+  if(g) list=list.filter(r=>r.group===g);
+  if(z) list=list.filter(r=>r.zone===z);
+  if(q) list=list.filter(r=>(r.club+r.name+r.song+r.singer+r.members).includes(q));
+  viewRows=list;
+  $("count").textContent="目前共 "+allRows.length+" 筆，篩到 "+list.length+" 筆。";
+  $("list").innerHTML=list.length?list.map(r=>`<div class="item"><b>${esc(r.song)}</b> ・ ${esc(r.group)} ・ ${esc(r.club)} ${esc(r.zone)} <span class="badge ${r.status==="已確認"?"ok":"wait"}">${esc(r.status)}</span><br>
+  <span class="small">參賽者／聯絡人：${esc(r.name)} ・ ${esc(r.phone)} ・ ${esc(r.email)}<br>
+  語言：${esc(r.lang)} ・ 原唱：${esc(r.singer)} ・ 版本／演唱者：${esc(r.version)||"—"} ・ 音源：${esc(r.sound)}<br>
+  ${r.joinDate?"入會日期："+esc(r.joinDate)+"<br>":""}${r.total?"合唱總人數："+esc(r.total)+" 人<br>":""}${r.members?"團員名單：<br>"+esc(r.members).replace(/\n/g,"<br>")+"<br>":""}${r.keyNote?"升降Key／備註："+esc(r.keyNote)+"<br>":""}
+  分會填表人：${esc(r.filler)||"—"} ・ ${esc(r.fillerPhone)||"—"} ・ 填表日期：${esc(r.fillDate)||"—"}<br>
+  填寫時間：${esc(r.createdAt)}</span>
+  <details><summary>看這筆的確認文字</summary><pre class="confirm">${esc(r.text)}</pre></details>
+  <div class="actions"><button class="ghost" onclick="setStatus(${r.row},'已確認')">標記為已確認</button><button class="ghost" onclick="setStatus(${r.row},'待確認')">改回待確認</button><button class="danger" onclick="delRow(${r.row})">刪除這筆</button></div></div>`).join(""):"<p>目前沒有紀錄。</p>";
+}
+$("qGroup").addEventListener("change",render);
+$("qZone").addEventListener("change",render);
+$("qName").addEventListener("input",render);
+$("btnReload").onclick=loadDb;
+$("btnExport").onclick=()=>{
+  if(!viewRows.length){alert("目前沒有可以匯出的紀錄。");return;}
+  const rows=[["填寫時間","報名組別","報名分會","分區","參賽者／聯絡人姓名","手機","Email","入會日期（新人組）","參賽歌曲名稱","歌曲語言類別","原唱歌手","版本／演唱者","演唱與音源","升降Key／備註","合唱團員名單","合唱總人數","分會填表人","分會填表人電話","填表日期","報名狀態"]];
+  viewRows.forEach(r=>rows.push([r.createdAt,r.group,r.club,r.zone,r.name,r.phone,r.email,r.joinDate,r.song,r.lang,r.singer,r.version,r.sound,r.keyNote,r.members,r.total,r.filler,r.fillerPhone,r.fillDate,r.status]));
+  const csv="\ufeff"+rows.map(x=>x.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+  a.download="第四專區歌唱比賽報名表.csv";a.click();URL.revokeObjectURL(a.href);
+};
+window.delRow=row=>{if(!confirm("確定要從資料庫刪除這筆嗎？刪除後無法復原，建議先匯出備份。"))return;
+  fetch(API+"?action=delete&token="+encodeURIComponent(TOKEN)+"&row="+row).then(()=>{allRows=allRows.filter(x=>x.row!==row);render();}).catch(()=>alert("刪除失敗，請直接到試算表刪除該列。"));};
+window.setStatus=(row,status)=>{ fetch(API+"?action=setStatus&token="+encodeURIComponent(TOKEN)+"&row="+row+"&status="+encodeURIComponent(status)).then(()=>{const r=allRows.find(x=>x.row===row); if(r) r.status=status; render();}).catch(()=>alert("狀態更新失敗，請直接到試算表修改。")); };
+function loadDb(){
+  if(!API){$("dbNote").textContent="設定檔還沒填資料庫網址：請等部署完成、config.js 更新後，關掉分頁重開後台一次。";return;}
+  $("dbNote").textContent="正在從資料庫載入…";
+  fetch(API+"?action=list&token="+encodeURIComponent(TOKEN)).then(r=>r.json()).then(j=>{if(!j.ok)throw 0;allRows=j.rows;$("dbNote").textContent="✅ 已載入 "+allRows.length+" 筆。";render();})
+  .catch(()=>{$("dbNote").textContent="⚠️ 載入失敗（可能是試算表尚未部署或網路問題），請直接打開試算表確認，裡面的資料就是後台資料。";});
+}
+function unlock(){sessionStorage.setItem("zone4-singing-admin-unlocked","1");$("lockSec").style.display="none";$("adminBody").style.display="block";loadDb();}
+function showLock(){
+  const pin=localStorage.getItem(PINKEY);
+  if(!pin){$("lockBody").innerHTML=`<p class="lead">第一次開後台，請先設一個你記得住的後台密碼。</p><label>設定後台密碼</label><input id="newPin" type="password" placeholder="至少 4 個字"><button class="primary" id="setPinBtn">設定並進入後台</button>`;
+    $("setPinBtn").onclick=()=>{const v=$("newPin").value.trim();if(v.length<4){alert("密碼至少 4 個字。");return;}localStorage.setItem(PINKEY,v);unlock();};}
+  else{$("lockBody").innerHTML=`<label>請輸入後台密碼</label><input id="pinIn" type="password" placeholder="輸入後台密碼"><button class="primary" id="unlockBtn">進入後台</button><button class="ghost" id="forgetBtn">忘記密碼（只清除密碼鎖，名單不會刪）</button>`;
+    $("unlockBtn").onclick=()=>{if($("pinIn").value===pin)unlock();else alert("密碼不對，請再試一次。");};
+    $("forgetBtn").onclick=()=>{if(confirm("確定要清除後台密碼鎖嗎？紀錄不會被刪除，下次開後台會請你重新設定密碼。")){localStorage.removeItem(PINKEY);location.reload();}};}
+}
+$("lockBtn").onclick=()=>{sessionStorage.removeItem("zone4-singing-admin-unlocked");location.reload();};
+$("changePinBtn").onclick=()=>{const v=prompt("請輸入新的後台密碼（至少 4 個字）：");if(v&&v.trim().length>=4){localStorage.setItem(PINKEY,v.trim());alert("後台密碼已更換。");}else if(v!==null){alert("密碼至少 4 個字，沒有更換。");}};
+if(sessionStorage.getItem("zone4-singing-admin-unlocked")==="1")unlock();else showLock();
+</script>
+</body>
+</html>
