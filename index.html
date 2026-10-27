@@ -36,6 +36,7 @@ button{width:100%;padding:14px;border:0;border-radius:14px;font-size:17px;font-w
 .chorus-row span{font-weight:800;text-align:center}
 pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border:2px solid #e6dcff;border-radius:12px;padding:14px;line-height:1.7;font-size:15px;font-family:inherit}
 .ok{color:#166534;font-weight:800}
+.photo-preview img{max-width:220px;max-height:260px;border-radius:14px;border:3px solid #e6dcff;display:block;margin-top:8px}
 @media(max-width:560px){.grid,.row,.row3{grid-template-columns:1fr}.chorus-row{grid-template-columns:24px 1fr}.chorus-row .c2,.chorus-row .c3{display:none}}
 </style>
 </head>
@@ -74,6 +75,11 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 <div><label for="email">Email ＊（確認信會寄到這裡）</label><input id="email" type="email" required placeholder="例如：abc@example.com"></div>
 </div>
 <p class="small">紙本沒有 Email 欄，這一欄是為了報名成功後寄確認信才加的，不會印在紙本上。</p>
+
+<label for="photo">參賽者照片 ＊（PPT 介紹用）</label>
+<input id="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
+<p class="small">請傳一張自己美美的照片，臉要清楚、正面最好，初賽 PPT 介紹就會用這張。送出前會自動縮到最長邊 1600px 再上傳，PPT 放大也夠清楚，手機傳也不會太慢。</p>
+<div id="photoPreview" class="photo-preview" style="display:none"><img id="photoImg" alt="參賽者照片預覽"><p class="small" id="photoInfo"></p></div>
 
 <div id="joinWrap" style="display:none">
 <label>入會日期 ＊（新人組必填，民國年）</label>
@@ -179,6 +185,32 @@ $("copyBtn").onclick=async()=>{
   try{ await navigator.clipboard.writeText(t); $("copyMsg").textContent="✅ 已複製確認文字。"; }
   catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); $("copyMsg").textContent="✅ 已複製確認文字。"; }
 };
+$("photo").addEventListener("change",()=>{
+  const file=$("photo").files[0];
+  if(!file){ $("photoPreview").style.display="none"; return; }
+  if(!file.type.startsWith("image/")){ alert("請上傳圖片檔（JPG、PNG 或 WebP）。"); $("photo").value=""; return; }
+  $("photoImg").src=URL.createObjectURL(file);
+  $("photoInfo").textContent="已選："+file.name+"（"+Math.round(file.size/1024)+" KB，送出前會自動縮圖）";
+  $("photoPreview").style.display="block";
+});
+async function compressPhoto(file){
+  try{
+    const url=URL.createObjectURL(file);
+    const img=await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=url; });
+    const maxSide=1600;
+    let w=img.naturalWidth, h=img.naturalHeight;
+    if(Math.max(w,h)>maxSide){ const s=maxSide/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+    const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+    const ctx=cv.getContext("2d"); ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,w,h); ctx.drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    const blob=await new Promise(res=>cv.toBlob(res,"image/jpeg",0.85));
+    const data=await new Promise((res,rej)=>{ const rd=new FileReader(); rd.onload=()=>res(rd.result); rd.onerror=rej; rd.readAsDataURL(blob); });
+    return { name:file.name, mime:"image/jpeg", data:String(data).split(",")[1] };
+  }catch(e){
+    const data=await new Promise((res,rej)=>{ const rd=new FileReader(); rd.onload=()=>res(rd.result); rd.onerror=rej; rd.readAsDataURL(file); });
+    return { name:file.name, mime:file.type||"image/jpeg", data:String(data).split(",")[1] };
+  }
+}
 $("f").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!group){ alert("請先選報名組別。"); return; }
@@ -217,8 +249,15 @@ $("f").addEventListener("submit",async e=>{
   if(missing.length){ alert("還有必填欄位沒填，請檢查後再送出。"); return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ alert("Email 格式不對，請檢查後再送出。"); return; }
   if(!$("agree").checked){ alert("請勾選已確認歌曲資訊。"); return; }
+  const photoFile=$("photo").files[0];
+  if(!photoFile){ alert("請上傳一張參賽者照片，初賽 PPT 介紹要用。"); return; }
   if(!API){ $("msg").innerHTML="⚠️ 資料庫還沒接好，這筆還沒寫入。請等部署完成後再送一次。"; return; }
-  $("submitBtn").disabled=true; $("submitBtn").textContent="送出中…"; $("msg").textContent="";
+  $("submitBtn").disabled=true; $("submitBtn").textContent="照片處理中…"; $("msg").textContent="正在縮圖上傳照片，請稍等…";
+  let photo;
+  try{ photo=await compressPhoto(photoFile); }
+  catch(err){ $("msg").textContent="⚠️ 照片處理失敗，請換一張照片再試一次。"; $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
+  data.photoName=photo.name; data.photoMime=photo.mime; data.photoData=photo.data;
+  $("submitBtn").textContent="送出中…"; $("msg").textContent="";
   try{
     const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(Object.assign({token:TOKEN},data))});
     const j=await r.json();
@@ -231,7 +270,7 @@ $("f").addEventListener("submit",async e=>{
     $("resultSec").scrollIntoView({behavior:"smooth"});
     $("msg").innerHTML="<span class='ok'>✅ 已送出報名。</span>";
     $("f").reset(); $("fillDate").value=new Date().toISOString().slice(0,10);
-    $("joinWrap").style.display="none"; $("chorusWrap").style.display="none"; $("langOtherWrap").style.display="none";
+    $("joinWrap").style.display="none"; $("chorusWrap").style.display="none"; $("langOtherWrap").style.display="none"; $("photoPreview").style.display="none";
   }catch(err){
     $("msg").textContent="⚠️ 送出失敗（可能是網路或資料庫還沒部署好），請確認網路後再按一次送出，不要重複填新的一筆。";
   }

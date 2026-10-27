@@ -74,6 +74,7 @@ function render(){
   <span class="small">參賽者／聯絡人：${esc(r.name)} ・ ${esc(r.phone)} ・ ${esc(r.email)}<br>
   語言：${esc(r.lang)} ・ 原唱：${esc(r.singer)} ・ 版本／演唱者：${esc(r.version)||"—"} ・ 音源：${esc(r.sound)}<br>
   ${r.joinDate?"入會日期："+esc(r.joinDate)+"<br>":""}${r.total?"合唱總人數："+esc(r.total)+" 人<br>":""}${r.members?"團員名單：<br>"+esc(r.members).replace(/\n/g,"<br>")+"<br>":""}${r.keyNote?"升降Key／備註："+esc(r.keyNote)+"<br>":""}
+  ${r.photo?`參賽者照片（PPT 用）：<a href="${esc(r.photo)}" target="_blank" rel="noopener">點開看照片</a><br>`:"參賽者照片：—（未上傳）<br>"}
   分會填表人：${esc(r.filler)||"—"} ・ ${esc(r.fillerPhone)||"—"} ・ 填表日期：${esc(r.fillDate)||"—"}<br>
   填寫時間：${esc(r.createdAt)}</span>
   <details><summary>看這筆的確認文字</summary><pre class="confirm">${esc(r.text)}</pre></details>
@@ -85,8 +86,8 @@ $("qName").addEventListener("input",render);
 $("btnReload").onclick=loadDb;
 $("btnExport").onclick=()=>{
   if(!viewRows.length){alert("目前沒有可以匯出的紀錄。");return;}
-  const rows=[["填寫時間","報名組別","報名分會","分區","參賽者／聯絡人姓名","手機","Email","入會日期（新人組）","參賽歌曲名稱","歌曲語言類別","原唱歌手","版本／演唱者","演唱與音源","升降Key／備註","合唱團員名單","合唱總人數","分會填表人","分會填表人電話","填表日期","報名狀態"]];
-  viewRows.forEach(r=>rows.push([r.createdAt,r.group,r.club,r.zone,r.name,r.phone,r.email,r.joinDate,r.song,r.lang,r.singer,r.version,r.sound,r.keyNote,r.members,r.total,r.filler,r.fillerPhone,r.fillDate,r.status]));
+  const rows=[["填寫時間","報名組別","報名分會","分區","參賽者／聯絡人姓名","手機","Email","入會日期（新人組）","參賽歌曲名稱","歌曲語言類別","原唱歌手","版本／演唱者","演唱與音源","升降Key／備註","合唱團員名單","合唱總人數","分會填表人","分會填表人電話","填表日期","報名狀態","參賽者照片"]];
+  viewRows.forEach(r=>rows.push([r.createdAt,r.group,r.club,r.zone,r.name,r.phone,r.email,r.joinDate,r.song,r.lang,r.singer,r.version,r.sound,r.keyNote,r.members,r.total,r.filler,r.fillerPhone,r.fillDate,r.status,r.photo]));
   const csv="\ufeff"+rows.map(x=>x.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
   a.download="第四專區歌唱比賽報名表.csv";a.click();URL.revokeObjectURL(a.href);
