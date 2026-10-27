@@ -74,7 +74,7 @@ function render(){
   <span class="small">參賽者／聯絡人：${esc(r.name)} ・ ${esc(r.phone)} ・ ${esc(r.email)}<br>
   語言：${esc(r.lang)} ・ 原唱：${esc(r.singer)} ・ 版本／演唱者：${esc(r.version)||"—"} ・ 音源：${esc(r.sound)}<br>
   ${r.joinDate?"入會日期："+esc(r.joinDate)+"<br>":""}${r.total?"合唱總人數："+esc(r.total)+" 人<br>":""}${r.members?"團員名單：<br>"+esc(r.members).replace(/\n/g,"<br>")+"<br>":""}${r.keyNote?"升降Key／備註："+esc(r.keyNote)+"<br>":""}
-  ${r.photo?`參賽者照片（PPT 用）：<a href="${esc(r.photo)}" target="_blank" rel="noopener">點開看照片</a><br>`:"參賽者照片：—（未上傳）<br>"}
+  ${r.photo?`參賽者照片（PPT 用）：${String(r.photo).split("\n").filter(Boolean).map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">點開看照片${String(r.photo).split("\n").filter(Boolean).length>1?" "+(i+1):""}</a>`).join("、")}<br>`:"參賽者照片：—（未上傳）<br>"}
   分會填表人：${esc(r.filler)||"—"} ・ ${esc(r.fillerPhone)||"—"} ・ 填表日期：${esc(r.fillDate)||"—"}<br>
   填寫時間：${esc(r.createdAt)}</span>
   <details><summary>看這筆的確認文字</summary><pre class="confirm">${esc(r.text)}</pre></details>

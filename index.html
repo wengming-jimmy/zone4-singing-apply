@@ -37,7 +37,9 @@ button{width:100%;padding:14px;border:0;border-radius:14px;font-size:17px;font-w
 pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border:2px solid #e6dcff;border-radius:12px;padding:14px;line-height:1.7;font-size:15px;font-family:inherit}
 .ok{color:#166534;font-weight:800}
 .photo-preview img{max-width:220px;max-height:260px;border-radius:14px;border:3px solid #e6dcff;display:block;margin-top:8px}
-@media(max-width:560px){.grid,.row,.row3{grid-template-columns:1fr}.chorus-row{grid-template-columns:24px 1fr}.chorus-row .c2,.chorus-row .c3{display:none}}
+@media(max-width:560px){.grid,.row,.row3{grid-template-columns:1fr}.chorus-row{grid-template-columns:24px 1fr}.chorus-row .c2,.chorus-row .c3{grid-column:2}}
+.chorus-photo-row{margin-bottom:8px}
+.chorus-photo-row label{margin:6px 0 4px;font-size:15px}
 </style>
 </head>
 <body>
@@ -59,8 +61,9 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 <h2 id="formTitle">報名資料</h2>
 <p class="lead" id="formLead"></p>
 <form id="f">
-<label for="club">報名分會 ＊</label>
+<label for="club" id="clubLabel">報名分會 ＊</label>
 <input id="club" type="text" required placeholder="例如：台北市○○獅子會">
+<p class="small" id="clubNote" style="display:none">合唱組是跨分會組隊，這一欄可以不填，以下面團員名單裡每位團員的所屬分會為準。</p>
 
 <label for="zone">分區 ＊</label>
 <select id="zone" required>
@@ -76,10 +79,17 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 </div>
 <p class="small">紙本沒有 Email 欄，這一欄是為了報名成功後寄確認信才加的，不會印在紙本上。</p>
 
+<div id="singlePhotoWrap">
 <label for="photo">參賽者照片 ＊（PPT 介紹用）</label>
 <input id="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
 <p class="small">請傳一張自己美美的照片，臉要清楚、正面最好，初賽 PPT 介紹就會用這張。送出前會自動縮到最長邊 1600px 再上傳，PPT 放大也夠清楚，手機傳也不會太慢。</p>
 <div id="photoPreview" class="photo-preview" style="display:none"><img id="photoImg" alt="參賽者照片預覽"><p class="small" id="photoInfo"></p></div>
+</div>
+<div id="chorusPhotoWrap" style="display:none">
+<label>團員照片 ＊（PPT 介紹用，每位團員各一張）</label>
+<p class="small">有填姓名的團員都要傳一張，臉要清楚、正面最好，初賽 PPT 介紹會用這些照片。順序跟上面團員名單同一排，送出前會自動縮到最長邊 1600px 再上傳。</p>
+<div id="chorusPhotoRows"></div>
+</div>
 
 <div id="joinWrap" style="display:none">
 <label>入會日期 ＊（新人組必填，民國年）</label>
@@ -114,7 +124,7 @@ pre.confirm{white-space:pre-wrap;word-break:break-word;background:#faf8ff;border
 
 <div id="chorusWrap" style="display:none">
 <h2 style="margin-top:16px">合唱組團員名單</h2>
-<p class="lead">可跨不同分會組隊，每位團員請分別填寫所屬分會。手機是選填。手機版只顯示姓名欄，分會與電話請用電腦填，或填完姓名後在「升降Key／備註」補上分會。</p>
+<p class="lead">可跨不同分會組隊，每位團員都要填姓名和所屬分會，手機是選填，手機版姓名、分會、電話都會顯示。照片在下面「團員照片」區，每位團員各傳一張。</p>
 <div id="chorusRows"></div>
 <p class="small">合唱總人數：<b id="chorusTotal">0</b> 人（依上面填了姓名的團員自動計算）。如超過 8 人，請把多的團員名單寫在上面的「升降Key／備註」。</p>
 </div>
@@ -154,11 +164,21 @@ const API=(typeof SINGING_API!=="undefined"&&SINGING_API.url)?SINGING_API.url:""
 const TOKEN=(typeof SINGING_API!=="undefined"&&SINGING_API.token)?SINGING_API.token:"";
 let group="";
 const chorusEl=$("chorusRows");
+const chorusPhotoEl=$("chorusPhotoRows");
 for(let i=1;i<=8;i++){
   const d=document.createElement("div"); d.className="chorus-row";
-  d.innerHTML="<span>"+i+"</span><input data-k='mname' placeholder='團員姓名'><input class='c2' data-k='mclub' placeholder='所屬獅子會／分會名稱'><input class='c3' data-k='mphone' type='tel' placeholder='聯絡電話（選填）'>";
+  d.innerHTML="<span>"+i+"</span><input data-k='mname' placeholder='團員姓名 ＊'><input class='c2' data-k='mclub' placeholder='所屬獅子會／分會名稱 ＊'><input class='c3' data-k='mphone' type='tel' placeholder='聯絡電話（選填）'>";
   chorusEl.appendChild(d);
+  const p=document.createElement("div"); p.className="chorus-photo-row";
+  p.innerHTML="<label>團員 "+i+" 照片（跟上面第 "+i+" 位團員同一人）</label><input data-k='mphoto' type='file' accept='image/jpeg,image/png,image/webp'><p class='small' data-k='mphotoInfo'></p>";
+  chorusPhotoEl.appendChild(p);
 }
+chorusPhotoEl.addEventListener("change",e=>{
+  const input=e.target; if(!input || !input.dataset || input.dataset.k!=="mphoto") return;
+  const info=input.parentElement.querySelector("[data-k='mphotoInfo']");
+  if(input.files[0]) info.textContent="已選："+input.files[0].name+"（送出前會自動縮圖）";
+  else info.textContent="";
+});
 function updateTotal(){
   const names=[...chorusEl.querySelectorAll("[data-k='mname']")].filter(x=>x.value.trim()).length;
   $("chorusTotal").textContent=names;
@@ -173,6 +193,12 @@ document.querySelectorAll(".groupbtn").forEach(b=>{
     $("formLead").textContent=group==="合唱組"?"合唱組請填團員名單，可跨不同分會組隊。":group==="新人組"?"新人組是入會未滿一年，入會日期必填，請填民國年。":"請照紙本欄位填寫，歌曲資訊請再三確認。";
     $("joinWrap").style.display=group==="新人組"?"block":"none";
     $("chorusWrap").style.display=group==="合唱組"?"block":"none";
+    $("chorusPhotoWrap").style.display=group==="合唱組"?"block":"none";
+    $("singlePhotoWrap").style.display=group==="合唱組"?"none":"block";
+    $("club").required=group!=="合唱組";
+    $("clubLabel").textContent=group==="合唱組"?"報名分會（合唱組可不填）":"報名分會 ＊";
+    $("clubNote").style.display=group==="合唱組"?"block":"none";
+    $("photo").required=group!=="合唱組";
     $("formSec").style.display="block";
     $("formSec").scrollIntoView({behavior:"smooth"});
   };
@@ -224,13 +250,15 @@ $("f").addEventListener("submit",async e=>{
   }
   let lang=$("lang").value;
   if(lang==="其他") lang="其他："+$("langOther").value.trim();
-  let members="", total=0;
+  let members="", total=0, memberNames=[];
   if(group==="合唱組"){
-    const rows=[...chorusEl.children].map(r=>{
+    const rows=[...chorusEl.children].map((r,idx)=>{
       const n=r.querySelector("[data-k='mname']").value.trim();
       const c=r.querySelector("[data-k='mclub']").value.trim();
       const p=r.querySelector("[data-k='mphone']").value.trim();
-      return n? n+(c?"（"+c+"）":"")+(p?"，電話："+p:"") : "";
+      if(n && !c){ alert("合唱組第 "+(idx+1)+" 位團員請填所屬分會。"); throw new Error("missing club"); }
+      if(n) memberNames.push(n);
+      return n? n+"（"+c+"）"+(p?"，電話："+p:"") : "";
     }).filter(Boolean);
     members=rows.join("\n"); total=rows.length;
     if(!total){ alert("合唱組請至少填一位團員。"); return; }
@@ -245,18 +273,31 @@ $("f").addEventListener("submit",async e=>{
     filler:$("filler").value.trim(), fillerPhone:$("fillerPhone").value.trim(), fillDate:$("fillDate").value
   };
   const missing=[];
-  ["club","zone","name","phone","email","song","lang","singer","sound"].forEach(k=>{ if(!data[k]) missing.push(k); });
+  (group==="合唱組"?["zone","name","phone","email","song","lang","singer","sound"]:["club","zone","name","phone","email","song","lang","singer","sound"]).forEach(k=>{ if(!data[k]) missing.push(k); });
   if(missing.length){ alert("還有必填欄位沒填，請檢查後再送出。"); return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){ alert("Email 格式不對，請檢查後再送出。"); return; }
   if(!$("agree").checked){ alert("請勾選已確認歌曲資訊。"); return; }
-  const photoFile=$("photo").files[0];
-  if(!photoFile){ alert("請上傳一張參賽者照片，初賽 PPT 介紹要用。"); return; }
   if(!API){ $("msg").innerHTML="⚠️ 資料庫還沒接好，這筆還沒寫入。請等部署完成後再送一次。"; return; }
   $("submitBtn").disabled=true; $("submitBtn").textContent="照片處理中…"; $("msg").textContent="正在縮圖上傳照片，請稍等…";
-  let photo;
-  try{ photo=await compressPhoto(photoFile); }
-  catch(err){ $("msg").textContent="⚠️ 照片處理失敗，請換一張照片再試一次。"; $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
-  data.photoName=photo.name; data.photoMime=photo.mime; data.photoData=photo.data;
+  let photos=[];
+  try{
+    if(group==="合唱組"){
+      const photoInputs=[...chorusPhotoEl.querySelectorAll("[data-k='mphoto']")];
+      for(let i=0;i<memberNames.length;i++){
+        const f=photoInputs[i] && photoInputs[i].files[0];
+        if(!f){ alert("合唱組第 "+(i+1)+" 位團員（"+memberNames[i]+"）請上傳一張照片，初賽 PPT 介紹要用。"); $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
+        const cp=await compressPhoto(f);
+        photos.push({ memberName:memberNames[i], name:cp.name, mime:cp.mime, data:cp.data });
+      }
+    }else{
+      const photoFile=$("photo").files[0];
+      if(!photoFile){ alert("請上傳一張參賽者照片，初賽 PPT 介紹要用。"); $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
+      const cp=await compressPhoto(photoFile);
+      photos.push({ memberName:data.name, name:cp.name, mime:cp.mime, data:cp.data });
+    }
+  }catch(err){ $("msg").textContent="⚠️ 照片處理失敗，請換一張照片再試一次。"; $("submitBtn").disabled=false; $("submitBtn").textContent="✅ 送出報名表"; return; }
+  data.photos=photos;
+  data.photoName=photos[0].name; data.photoMime=photos[0].mime; data.photoData=photos[0].data;
   $("submitBtn").textContent="送出中…"; $("msg").textContent="";
   try{
     const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(Object.assign({token:TOKEN},data))});
@@ -272,7 +313,7 @@ $("f").addEventListener("submit",async e=>{
     $("resultSec").scrollIntoView({behavior:"smooth"});
     $("msg").innerHTML="<span class='ok'>✅ 已送出報名。</span>";
     $("f").reset(); $("fillDate").value=new Date().toISOString().slice(0,10);
-    $("joinWrap").style.display="none"; $("chorusWrap").style.display="none"; $("langOtherWrap").style.display="none"; $("photoPreview").style.display="none";
+    $("joinWrap").style.display="none"; $("chorusWrap").style.display="none"; $("chorusPhotoWrap").style.display="none"; $("singlePhotoWrap").style.display="block"; $("langOtherWrap").style.display="none"; $("photoPreview").style.display="none";
   }catch(err){
     $("msg").textContent="⚠️ 送出失敗（可能是網路或資料庫還沒部署好），請確認網路後再按一次送出，不要重複填新的一筆。";
   }
